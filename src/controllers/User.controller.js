@@ -21,7 +21,7 @@ export const SignUp = async (req, res) => {
   const acesToken = acessToken(created);
   const refreshTken = refreshToken(created);
 
-  res.cookie('resfresh_token', refreshTken, {
+  res.cookie('resfresh_token', acesToken, {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
@@ -45,8 +45,7 @@ export const Login = async (req, res) => {
 
   const isValidPass = await bcrypt.compare(password, checkEmail.password);
 
-  if(!isValidPass) return res.status(401).json({messege:"incorrect pas"})
-
+  if (!isValidPass) return res.status(401).json({ messege: 'incorrect pas' });
 
   const acesToken = acessToken(checkEmail);
   const refreshTken = refreshToken(checkEmail);
@@ -62,4 +61,21 @@ export const Login = async (req, res) => {
     user: checkEmail,
     accessToken: acesToken,
   });
+};
+
+export const updteUser = async (req, res) => {
+  const { email } = req.user;
+  const data = req.body;
+
+  const updateDta = await UserModel.findOneAndUpdate({email:email},data,{
+    new:true,
+  });
+
+  if(!updateDta){
+    return res.status(401).json({messege:"problem"})
+  }
+  res.status(202).json({
+    updateDta,
+    messege:"worked"
+  })
 };
